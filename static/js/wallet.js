@@ -1,7 +1,13 @@
 class Wallet extends React.Component {
+    getParamWallet = "";
+
     constructor() {
         super();
-        let localWallet = localStorage.getItem("wallet");
+        const searchParams = new URLSearchParams(window.location.search.substr(1));
+        if (searchParams.get("wallet")) {
+            this.getParamWallet = searchParams.get("wallet");
+        }
+        let localWallet = this.getParamWallet || localStorage.getItem("wallet");
         if (localWallet) {
             this.state = {wallet: localWallet};
         } else {
@@ -14,7 +20,9 @@ class Wallet extends React.Component {
 
     handleChange(event) {
         this.setState({ wallet: event.target.value });
-        localStorage.setItem("wallet", event.target.value);
+        if (!this.getParamWallet) {
+            localStorage.setItem("wallet", event.target.value);
+        }
     }
 
     async handleSubmit(event) {
