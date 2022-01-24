@@ -28,7 +28,7 @@ function updateVisPrice() {
     return visPromise;
 }
 
-function updatePrices() {
+async function updatePrices() {
     console.debug("Updating Prices " + new Date().toLocaleTimeString())
     unbredPromise = got({
         method: 'get',
@@ -46,7 +46,13 @@ function updatePrices() {
         }
     }).json();
 
-    updateVisPrice();
+    let v = await updateVisPrice();
+    let token = JSON.parse(v.body).tokens["0xcc1b9517460d8ae86fe576f614d091fca65a28fc"];
+    for (let i = 0; i < 10 && typeof token === "undefined"; i++) {
+        console.log("Retrying VIS Price")
+        v = await updateVisPrice();
+        token = JSON.parse(v.body).tokens["0xcc1b9517460d8ae86fe576f614d091fca65a28fc"];
+    }
 }
 
 app.get("/my-pegas", async (req,res) => {
@@ -145,11 +151,8 @@ app.get("/pricing", async (req,res) => {
 
     let v = await visPromise;
     let token = JSON.parse(v.body).tokens["0xcc1b9517460d8ae86fe576f614d091fca65a28fc"];
-    for (let i = 0; i < 10 && typeof token === "undefined"; i++) {
-        v = await updateVisPrice();
-    }
-    console.log(token, visPrice);
     visPrice = token ? token.price : visPrice;
+    console.log(token, visPrice);
 
     res.send({
         bredFloor: bredFloor,

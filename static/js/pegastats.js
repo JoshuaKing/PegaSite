@@ -15,30 +15,51 @@ class PegaStats extends React.Component {
 
 
         return (
-            <div className="ui six statistics">
-                <div className="ui small statistic">
-                    <div className="value">{this.props.pegas.length}</div>
-                    <div className="label">Pegas</div>
+            <div>
+                <div className="ui five statistics">
+                    <div className="ui small statistic">
+                        <div className="value">{this.props.pegas.length}</div>
+                        <div className="label">Pegas</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">{this.props.pegas.filter(p=> p.breedCount>0).length}</div>
+                        <div className="label">Bred Pegas</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">{this.props.pegas.filter(p=> p.breedCount===0).length}</div>
+                        <div className="label">Unbred Pegas</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">{breedsRemaining}</div>
+                        <div className="label">More Breeds</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">{Math.ceil(vis/1000)}k</div>
+                        <div className="label">VIS Breed Cost</div>
+                    </div>
                 </div>
-                <div className="ui small statistic">
-                    <div className="value">{this.props.pegas.filter(p=>p.gender==="Male").length}</div>
-                    <div className="label">Males</div>
-                </div>
-                <div className="ui small statistic">
-                    <div className="value">{this.props.pegas.filter(p=>p.gender==="Female").length}</div>
-                    <div className="label">Females</div>
-                </div>
-                <div className="ui small statistic">
-                    <div className="value">{breedsRemaining}</div>
-                    <div className="label">More Breeds</div>
-                </div>
-                <div className="ui small statistic">
-                    <div className="value">{Math.ceil(vis/1000)}k</div>
-                    <div className="label">VIS Breed Cost</div>
-                </div>
-                <div className="ui small statistic">
-                    <div className="value">${Math.round(netWorth/100)/10}k</div>
-                    <div className="label">Net Worth</div>
+                <div className="ui hidden divider"/>
+                <div className="ui five statistics">
+                    <div className="ui small statistic">
+                        <div className="value">${this.props.pricing.bredFloor}</div>
+                        <div className="label">Bred Floor</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">${this.props.pricing.unbredFloor}</div>
+                        <div className="label">Unbred Floor</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">${Math.round(pegasValue/100)/10}k</div>
+                        <div className="label">Pega Value</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">${Math.round(visValue/100)/10}k</div>
+                        <div className="label">VIS Value</div>
+                    </div>
+                    <div className="ui small statistic">
+                        <div className="value">${Math.round(netWorth/100)/10}k</div>
+                        <div className="label">Net Worth</div>
+                    </div>
                 </div>
             </div>
         );
