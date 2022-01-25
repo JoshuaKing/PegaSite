@@ -73,8 +73,8 @@ app.get("/my-pegas", async (req,res) => {
         let nb = lb + (pega.lastBreedTime > 0 ? breedCds[pega.bloodLine] : 96*60*60);
         let breedable = nb * 1000 < Date.now();
         let breedString = breedable ? `Now (${new Date(nb * 1000).toLocaleString()})` : `Can breed ${new Date(nb * 1000).toLocaleString()}`;
-        console.log(pega);
-        console.log(pega.id + " is rented = ", !!pega.renterAddress || pega.service === "RENT_SERVICE")
+        // console.log(pega);
+        // console.log(pega.id + " is rented = ", !!pega.renterAddress || pega.service === "RENT_SERVICE")
         return {
             id: pega.id,
             name: pega.name,
