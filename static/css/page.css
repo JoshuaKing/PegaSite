@@ -1,0 +1,11 @@
+.tableFilters .checkbox {
+    margin-top: 0.5em !important;
+}
+
+table.pegalist thead th:hover {
+    cursor: pointer;
+}
+
+table.pegalist>tbody tr.visible:nth-of-type(2n) {
+    background: lightgrey;
+}

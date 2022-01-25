@@ -50,8 +50,9 @@ class Wallet extends React.Component {
 
         ReactDOM.render(<PegaStats pegas={pegaData} vis={visData.vis} pricing={pricing}/>, $("#pegaStats")[0]);
         ReactDOM.render(<Outlook pegas={pegaData} pricing={pricing}/>, $("#pegaOutlook")[0]);
-        ReactDOM.render(<Pegas pegas={pegaData.filter(p=>p.gender==="Male")}/>, $("#males")[0]);
-        ReactDOM.render(<Pegas pegas={pegaData.filter(p=>p.gender==="Female")}/>, $("#females")[0]);
+        ReactDOM.render(<PegaTable pegas={pegaData} pricing={pricing}/>, $("#pegaTable")[0]);
+        // ReactDOM.render(<Pegas pegas={pegaData.filter(p=>p.gender==="Male")}/>, $("#males")[0]);
+        // ReactDOM.render(<Pegas pegas={pegaData.filter(p=>p.gender==="Female")}/>, $("#females")[0]);
     }
 
     render() {

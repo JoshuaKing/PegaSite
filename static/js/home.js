@@ -1,3 +1,28 @@
+function isNumeric(str) {
+    if (typeof str != "string") return false // we only process strings!
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
+
+function getMaxBreeds(pricing) {
+    const breedCosts = {
+        "1": 4000,
+        "2": 8000,
+        "3": 12000,
+        "4": 20000
+    }
+
+    let maxBreeds = 0;
+    const PgxCost = 15;
+    for (let i = 0; i < 4; i++) {
+        if (breedCosts[maxBreeds + 1] * pricing.visPrice + PgxCost < pricing.unbredFloor) {
+            maxBreeds++;
+        }
+    }
+    console.log("Max Breeds = " + maxBreeds);
+    return maxBreeds;
+}
+
 function getRequirements(pegas, pricing) {
     pegas = JSON.parse(JSON.stringify(pegas));
     const breedCds = {
@@ -12,14 +37,7 @@ function getRequirements(pegas, pricing) {
         "3": 12000,
         "4": 20000
     }
-    let MAX_BREEDS = 0;
-    const PgxCost = 15;
-    for (let i = 0; i < 4; i++) {
-        if (breedCosts[MAX_BREEDS + 1] * pricing.visPrice + PgxCost < pricing.unbredFloor) {
-            MAX_BREEDS++;
-        }
-    }
-    console.log("Max Breeds = " + MAX_BREEDS);
+    let MAX_BREEDS = getMaxBreeds(pricing);
 
     let midnight = new Date();
     midnight.setHours(23, 59, 59, 999);
@@ -77,4 +95,5 @@ function getRequirements(pegas, pricing) {
 
 $(document).ready(() => {
     ReactDOM.render(<Wallet/>, $("#polygonWallet")[0]);
+
 })
