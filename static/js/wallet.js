@@ -46,7 +46,7 @@ class Wallet extends React.Component {
             .reduce((acc,v)=>acc+v,0);
         let visValue = currencyData.vis * pricing.visPrice;
         let usdtValue = currencyData.usdt;
-        let value = pegasValue + visValue;
+        let value = pegasValue + visValue + usdtValue;
         console.log(`value: ${pegasValue}(Pega) + ${visValue}(VIS) + ${usdtValue}(USDT) = ${value}`);
 
         ReactDOM.render(<PegaStats pegas={pegaData} vis={currencyData.vis} usdt={currencyData.usdt} pricing={pricing}/>, $("#pegaStats")[0]);

@@ -11,7 +11,7 @@ class PegaStats extends React.Component {
             .reduce((acc,v)=>acc+v,0);
         let visValue = this.props.vis * this.props.pricing.visPrice;
         let usdtValue = this.props.usdt;
-        let netWorth = pegasValue + visValue;
+        let netWorth = pegasValue + visValue + usdtValue;
         console.log(`net worth: ${pegasValue}(Pega) + ${visValue}(VIS) + ${usdtValue}(USDT) = ${netWorth}`);
 
 
