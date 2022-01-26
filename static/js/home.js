@@ -65,8 +65,9 @@ function getRequirements(pegas, pricing) {
         while (male && female) {
             male.breedCount++;
             female.breedCount++;
-            male.breedable += breedCds[male.bloodLine];
-            female.breedable += breedCds[female.bloodLine];
+            let breedTime = Math.max(male.breedable, female.breedable);
+            male.breedable = breedTime + breedCds[male.bloodLine];
+            female.breedable = breedTime + breedCds[female.bloodLine];
             vis += breedCosts[male.breedCount];
             breeds.push({
                 sire: male,

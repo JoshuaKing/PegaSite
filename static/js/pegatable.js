@@ -85,8 +85,7 @@ class PegaTable extends React.Component {
                     return false;
                 }
                 return true;
-            })
-            .sort((a,b) => {
+            }).sort((a,b) => {
                 if (this.state.sortAsc) {
                     return b[this.state.sortField] - a[this.state.sortField];
                 }
