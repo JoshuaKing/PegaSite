@@ -108,7 +108,7 @@ app.get("/my-pegas", async (req,res) => {
 
     res.send(pegas);
 })
-app.get("/my-vis", async (req,res) => {
+app.get("/my-currency", async (req,res) => {
     let wallet = req.query.wallet;
     wallet = web3.utils.toChecksumAddress(wallet);
 
@@ -121,11 +121,23 @@ app.get("/my-vis", async (req,res) => {
         }
     });
 
+
+    const USDT_TOKEN_CONTRACT = `0xc2132d05d31c914a87c6611c10748aeb04b58e8f`;
+    let usdtData = await got({
+        method: "get",
+        url: `https://api.polygonscan.com/api?module=account&action=tokenbalance&tag=latest&contractaddress=${USDT_TOKEN_CONTRACT}&address=${wallet}&apikey=${POLY_API_KEY}`,
+        headers: {
+            'user-agent': userAgent
+        }
+    });
+
     const scale = 1000000000000000000;
     let vis = JSON.parse(data.body).result / scale;
+    let usdt = JSON.parse(usdtData.body).result / 1000000;
 
     res.send({
-        vis: vis
+        vis: vis,
+        usdt: usdt
     });
 })
 

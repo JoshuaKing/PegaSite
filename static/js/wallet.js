@@ -30,7 +30,7 @@ class Wallet extends React.Component {
 
         let pricingPromise = fetch(`/pricing`);
         let pegaPromise = fetch(`/my-pegas?wallet=${this.state.wallet}`);
-        let visPromise = fetch(`/my-vis?wallet=${this.state.wallet}`);
+        let currencyPromise = fetch(`/my-currency?wallet=${this.state.wallet}`);
 
         let pricing = await (await pricingPromise).json();
         console.log("pricing:", pricing);
@@ -38,17 +38,18 @@ class Wallet extends React.Component {
         let pegaData = await (await pegaPromise).json();
         console.log("got my pegas for " + this.state.wallet);
 
-        let visData = await (await visPromise).json();
-        console.log(visData);
+        let currencyData = await (await currencyPromise).json();
+        console.log(currencyData);
 
         let pegasValue = pegaData
             .map(p=> p.breedCount===0 ? pricing.unbredFloor : pricing.bredFloor)
             .reduce((acc,v)=>acc+v,0);
-        let visValue = visData.vis * pricing.visPrice;
+        let visValue = currencyData.vis * pricing.visPrice;
+        let usdtValue = currencyData.usdt;
         let value = pegasValue + visValue;
-        console.log(`value: ${pegasValue} + ${visValue} = ${value}`);
+        console.log(`value: ${pegasValue}(Pega) + ${visValue}(VIS) + ${usdtValue}(USDT) = ${value}`);
 
-        ReactDOM.render(<PegaStats pegas={pegaData} vis={visData.vis} pricing={pricing}/>, $("#pegaStats")[0]);
+        ReactDOM.render(<PegaStats pegas={pegaData} vis={currencyData.vis} usdt={currencyData.usdt} pricing={pricing}/>, $("#pegaStats")[0]);
         ReactDOM.render(<Outlook pegas={pegaData} pricing={pricing}/>, $("#pegaOutlook")[0]);
         ReactDOM.render(<PegaTable pegas={pegaData} pricing={pricing}/>, $("#pegaTable")[0]);
         // ReactDOM.render(<Pegas pegas={pegaData.filter(p=>p.gender==="Male")}/>, $("#males")[0]);
