@@ -4,9 +4,9 @@ class OutlookBreed extends React.Component {
             <div className="ui item">
                 <div className="ui content">
                     <span className="ui small text">
-                        {this.props.breed.sire.name}
+                        <a href={`https://https://play.pegaxy.io/my-assets/pega/${this.props.breed.sire.id}`}>{this.props.breed.sire.id}</a>
                         <i className="ui heart outline icon"/>
-                        {this.props.breed.matron.name}
+                        <a href={`https://https://play.pegaxy.io/my-assets/pega/${this.props.breed.matron.id}`}>{this.props.breed.matron.id}</a>
                     </span>
                 </div>
             </div>
@@ -41,7 +41,7 @@ class OutlookDate extends React.Component {
 
 class Outlook extends React.Component {
     render() {
-        let requirements = getRequirements(this.props.pegas, this.props.pricing).slice(0, 12);
+        let requirements = getRequirements(this.props.pegas, this.props.pricing).slice(0, 8);
 
         return (
             requirements.map(r => <OutlookDate key={r.date} date={r.date} vis={r.vis} breeds={r.breeds}/>)

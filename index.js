@@ -68,18 +68,16 @@ app.get("/my-pegas", async (req,res) => {
     });
 
     let pegas = JSON.parse(data.body).map((pega) => {
-        // console.log(pega);
         let lb = pega.lastBreedTime > 0 ? pega.lastBreedTime : pega.bornTime;
         let nb = lb + (pega.lastBreedTime > 0 ? breedCds[pega.bloodLine] : 96*60*60);
         let breedable = nb * 1000 < Date.now();
-        let breedString = breedable ? `Now (${new Date(nb * 1000).toLocaleString()})` : `Can breed ${new Date(nb * 1000).toLocaleString()}`;
-        // console.log(pega);
-        // console.log(pega.id + " is rented = ", !!pega.renterAddress || pega.service === "RENT_SERVICE")
+
+        let isRentable = pega.bornTime + 24*60*60 < Date.now() / 1000;
         return {
             id: pega.id,
             name: pega.name,
             earned: pega.ownerPegaRewards || 0,
-            energy: pega.energy,
+            energy: isRentable ? pega.energy : 0,
             gender: pega.gender,
             bloodLine: pega.bloodLine,
             breedType: pega.breedType,
@@ -88,23 +86,14 @@ app.get("/my-pegas", async (req,res) => {
             matron: pega.motherId,
             service: pega.service,
             isRented: !!pega.renterAddress || !!pega.renterId || pega.service === "RENT_SERVICE",
-            isRentable: pega.bornTime + 24*60*60 < Date.now() / 1000,
+            isRentable: isRentable,
             renterAddress: pega.renterAddress,
             lastRenterIsDirect: pega.lastRenterIsDirect,
             bornTime: pega.bornTime,
             isBreedable: breedable,
-            breedString: breedString,
             breedable: nb
         };
     }).sort((a,b) => a.breedable - b.breedable);
-
-    pegas.forEach(p => {
-        if (p.service === "RENT_SERVICE" && p.lastRenterRentAt < Date.now() / 1000 - 60 * 60 && p.energy >= 20) {
-            p.takeBackAlert = true;
-        } else if (p.energy >= 20 && p.bornTime < Date.now() / 1000 - 60 * 60 * 24) {
-            p.rentOutAlert = true;
-        }
-    });
 
     res.send(pegas);
 })

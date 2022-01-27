@@ -6,6 +6,26 @@ table.pegalist thead th:hover {
     cursor: pointer;
 }
 
-table.pegalist>tbody tr.visible:nth-of-type(2n) {
-    background: lightgrey;
+table.pegalist a {
+    color: inherit;
+}
+
+table.pegalist .mars.icon {
+    color: #aec6cf;
+}
+table.pegalist .venus.icon {
+    color: #FAA0A0;
+}
+
+
+#pegaOutlook a {
+    color: inherit;
+}
+
+#pegaOutlook .heart {
+    margin-left: 0.25rem;
+}
+
+#pegaOutlook .content {
+    text-align: center;
 }

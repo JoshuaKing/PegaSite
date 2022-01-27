@@ -3,10 +3,11 @@ class PegaRow extends React.Component {
         const p = this.props.pega;
         return (
             <tr key={p.id}>
-                <td>{p.id}</td>
+                <td><a href={`https://https://play.pegaxy.io/my-assets/pega/${p.id}`}>{p.id}</a></td>
+                <td><i className={p.gender === "Male" ? "ui mars icon" : "ui venus icon"}/></td>
                 <td>{p.breedCount}</td>
                 <td>{p.energy}</td>
-                <td>{p.renterAddress ? "Rented" : ""}</td>
+                <td>{p.isRented ? "Rented" : ""}</td>
                 <td>{p.breedString}</td>
                 <td>{p.name}</td>
             </tr>
@@ -40,7 +41,7 @@ class PegaTable extends React.Component {
                 sortField: field,
                 sortAsc: true,
                 searchString: "",
-                rented: 0,
+                rented: "either",
                 filterRentable: false,
                 filterBreedable: false,
                 filterProfitable: false
@@ -59,9 +60,9 @@ class PegaTable extends React.Component {
         const pegas = this.props.pegas
             .filter(p => {
                 const s = this.state;
-                if (s.rented === "1" && !p.isRented) {
+                if (s.rented === "rented" && !p.isRented) {
                     return false;
-                } else if (s.rented === "2" && p.isRented) {
+                } else if (s.rented === "available" && p.isRented) {
                     return false;
                 }
 
@@ -87,7 +88,13 @@ class PegaTable extends React.Component {
                 return true;
             }).sort((a,b) => {
                 if (this.state.sortAsc) {
+                    if (typeof b[this.state.sortField] === "string") {
+                        return b[this.state.sortField].localeCompare(a[this.state.sortField] || "");
+                    }
                     return b[this.state.sortField] - a[this.state.sortField];
+                }
+                if (typeof a[this.state.sortField] === "string") {
+                    return a[this.state.sortField].localeCompare(b[this.state.sortField] || "");
                 }
                 return a[this.state.sortField] - b[this.state.sortField];
             }).map(p => <PegaRow pega={p}/>);
@@ -105,24 +112,24 @@ class PegaTable extends React.Component {
                         <div className="rented ui selection dropdown">
                             <input type="hidden" name="rented"/>
                             <i className="ui dropdown icon"/>
-                            <div className="default text">Rent status</div>
+                            <div className="default text">Rental status</div>
                             <div className="scrollhint menu">
-                                <div className="item" data-value="0">No Preference</div>
-                                <div className="item" data-value="1">Rented</div>
-                                <div className="item" data-value="2">Available</div>
+                                <div className="item" data-value="either">No Preference</div>
+                                <div className="item" data-value="rented">Rented</div>
+                                <div className="item" data-value="available">Available</div>
                             </div>
                         </div>
                         <div className="ui toggle checkbox field">
                             <input type="checkbox" onChange={(e)=>this.filter(e.target.checked,'filterRentable')}/>
-                            <label>Filter Unrentable</label>
+                            <label>Rentable Only</label>
                         </div>
                         <div className="ui toggle checkbox field">
                             <input type="checkbox" onChange={(e)=>this.filter(e.target.checked,'filterBreedable')}/>
-                            <label>Filter Breedable</label>
+                            <label>Breedable Only</label>
                         </div>
                         <div className="ui toggle checkbox field">
                             <input type="checkbox" onChange={(e)=>this.filter(e.target.checked,'filterProfitable')}/>
-                            <label>Filter Profitable</label>
+                            <label>Profitable Breeds Only</label>
                         </div>
                     </div>
                 </div>
@@ -130,6 +137,7 @@ class PegaTable extends React.Component {
                     <thead>
                     <tr>
                         <th onClick={()=>this.sort('id')}>ID</th>
+                        <th onClick={()=>this.sort('gender')}>Sex</th>
                         <th onClick={()=>this.sort('breedCount')}>BC</th>
                         <th onClick={()=>this.sort('energy')}>Energy</th>
                         <th onClick={()=>this.sort('renterAddress')}>Rented</th>

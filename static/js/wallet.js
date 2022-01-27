@@ -16,6 +16,10 @@ class Wallet extends React.Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        if (this.getParamWallet) {
+            this.retrieve();
+        }
     }
 
     handleChange(event) {
@@ -26,8 +30,12 @@ class Wallet extends React.Component {
     }
 
     async handleSubmit(event) {
-        event.preventDefault()
+        // commented out to allow page redirect for url with 'wallet' GET param
+        // event.preventDefault();
+        // await this.retrieve();
+    }
 
+    async retrieve() {
         let pricingPromise = fetch(`/pricing`);
         let pegaPromise = fetch(`/my-pegas?wallet=${this.state.wallet}`);
         let currencyPromise = fetch(`/my-currency?wallet=${this.state.wallet}`);
@@ -41,26 +49,21 @@ class Wallet extends React.Component {
         let currencyData = await (await currencyPromise).json();
         console.log(currencyData);
 
-        let pegasValue = pegaData
-            .map(p=> p.breedCount===0 ? pricing.unbredFloor : pricing.bredFloor)
-            .reduce((acc,v)=>acc+v,0);
-        let visValue = currencyData.vis * pricing.visPrice;
-        let usdtValue = currencyData.usdt;
-        let value = pegasValue + visValue + usdtValue;
-        console.log(`value: ${pegasValue}(Pega) + ${visValue}(VIS) + ${usdtValue}(USDT) = ${value}`);
+        pegaData.forEach(p => {
+            p.breedString = p.isBreedable ? `Now (${new Date(p.breedable * 1000).toLocaleString()})` : `Can breed ${new Date(p.breedable * 1000).toLocaleString()}`;
+        })
 
-        ReactDOM.render(<PegaStats pegas={pegaData} vis={currencyData.vis} usdt={currencyData.usdt} pricing={pricing}/>, $("#pegaStats")[0]);
+        ReactDOM.render(<PegaStats pegas={pegaData} vis={currencyData.vis} usdt={currencyData.usdt}
+                                   pricing={pricing}/>, $("#pegaStats")[0]);
         ReactDOM.render(<Outlook pegas={pegaData} pricing={pricing}/>, $("#pegaOutlook")[0]);
         ReactDOM.render(<PegaTable pegas={pegaData} pricing={pricing}/>, $("#pegaTable")[0]);
-        // ReactDOM.render(<Pegas pegas={pegaData.filter(p=>p.gender==="Male")}/>, $("#males")[0]);
-        // ReactDOM.render(<Pegas pegas={pegaData.filter(p=>p.gender==="Female")}/>, $("#females")[0]);
     }
 
     render() {
         return (
             <form className="ui labeled action input" onSubmit={this.handleSubmit}>
                 <div className="ui label">Polygon Wallet:</div>
-                <input id="wallet" className="ui input" style={{"width": "350px"}} onChange={this.handleChange} value={this.state.wallet}/>
+                <input id="wallet" name="wallet" className="ui input" style={{"width": "350px"}} onChange={this.handleChange} value={this.state.wallet}/>
                 <button className="ui teal button" type="submit">Retrieve</button>
             </form>
         );
