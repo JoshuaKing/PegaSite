@@ -46,10 +46,8 @@ function getRequirements(pegas, pricing) {
         let vis = 0;
         let breeds = [];
         let cutoff = midnight.getTime();
-        let male = pegas
-            .filter(p=>p.gender === "Male")
-            .find(p=>p.breedCount < MAX_BREEDS && p.breedable * 1000 < cutoff);
-        if (!male) {
+        let males = pegas.filter(p=>p.gender === "Male" && p.breedCount < MAX_BREEDS && p.breedable * 1000 < cutoff);
+        if (!males.length) {
             requirements.push({
                 date: midnight.toLocaleDateString(),
                 vis: vis,
@@ -58,11 +56,15 @@ function getRequirements(pegas, pricing) {
             midnight = new Date(midnight.getTime() + 24 * 60 * 60 * 1000);
             continue;
         }
-        let female = pegas
-            .filter(p=>p.gender === "Female")
-            .find(p=>p.breedCount === male.breedCount && p.bloodLine === male.bloodLine && p.breedable * 1000 < cutoff);
-
-        while (male && female) {
+        let male = males.shift();
+        while (male) {
+            let female = pegas
+                .filter(p=>p.gender === "Female")
+                .find(p=>p.breedCount === male.breedCount && p.bloodLine === male.bloodLine && p.breedable * 1000 < cutoff);
+            if (!female) {
+                male = males.shift();
+                continue;
+            }
             male.breedCount++;
             female.breedCount++;
             let breedTime = Math.max(male.breedable, female.breedable);
@@ -74,9 +76,7 @@ function getRequirements(pegas, pricing) {
                 matron: female
             });
 
-            male = pegas
-                .filter(p=>p.gender === "Male")
-                .find(p=>p.breedCount < MAX_BREEDS && p.breedable * 1000 < cutoff);
+            male = males.shift();
             if (!male) {
                 break;
             }

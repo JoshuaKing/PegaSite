@@ -141,7 +141,6 @@ app.get("/pricing", async (req,res) => {
             continue;
         }
         bredFloor = Math.min(bredFloor, a.price / 1000000);
-        // console.log("pricing: ", bredFloor, unbredFloor);
     }
 
     // unbred
@@ -150,8 +149,7 @@ app.get("/pricing", async (req,res) => {
         if (a.isAuction) {
             continue;
         }
-            unbredFloor = Math.min(unbredFloor, a.price / 1000000);
-            // console.log("pricing: ", bredFloor, unbredFloor);
+        unbredFloor = Math.min(unbredFloor, a.price / 1000000)
     }
 
     let v = await visPromise;
