@@ -43,8 +43,7 @@ class Outlook extends React.Component {
     render() {
         let requirements = getRequirements(this.props.pegas, this.props.pricing).slice(0, 8);
 
-        return (
-            requirements.map(r => <OutlookDate key={r.date} date={r.date} vis={r.vis} breeds={r.breeds}/>)
-        );
+        let outlookDates = requirements.map(r => <OutlookDate key={r.date} date={r.date} vis={r.vis} breeds={r.breeds}/>);
+        return outlookDates;
     }
 }

@@ -58,6 +58,13 @@ class PegaStats extends React.Component {
                         <div className="label">VIS Value</div>
                     </div>
                     <div className="ui small statistic">
+                        <div className="value">${Math.round(usdtValue/100)/10}k</div>
+                        <div className="label">USDT</div>
+                    </div>
+                </div>
+                <div className="ui hidden divider"/>
+                <div className="ui one statistics">
+                    <div className="ui large statistic">
                         <div className="value">${Math.round(netWorth/100)/10}k</div>
                         <div className="label">Net Worth</div>
                     </div>
