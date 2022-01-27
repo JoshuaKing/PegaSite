@@ -104,7 +104,7 @@ class PegaTable extends React.Component {
                 <div className="tableFilters ui form">
                     <div className="ui five fields">
                         <div className="ui action input field">
-                            <input placeholder="Search ID's/names" onChange={(e)=>this.filter(e.target.value, 'searchString')}/>
+                            <input placeholder="Search ID's/Names/Wallets" onChange={(e)=>this.filter(e.target.value, 'searchString')}/>
                             <button className="ui icon button">
                                 <i className="ui search icon"/>
                             </button>
