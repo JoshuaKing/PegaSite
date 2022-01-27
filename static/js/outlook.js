@@ -26,11 +26,15 @@ class OutlookBreeds extends React.Component {
 }
 
 class OutlookDate extends React.Component {
+    numberWithCommas(x) {
+        return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     render() {
         return (
             <div className="ui four wide column">
                 <div className="ui tiny header">{this.props.date}
-                    <div className="ui tiny label">{this.props.vis}<span className="ui detail">VIS</span></div>
+                    <div className="ui tiny label">{this.numberWithCommas(this.props.vis/1000)}k<span className="ui detail">VIS</span></div>
                     <div className="ui tiny label">{this.props.breeds.length}<span className="ui detail">Breeds</span></div>
                 </div>
                 <OutlookBreeds breeds={this.props.breeds}/>
