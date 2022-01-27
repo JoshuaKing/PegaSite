@@ -96,5 +96,4 @@ function getRequirements(pegas, pricing) {
 
 $(document).ready(() => {
     ReactDOM.render(<Wallet/>, $("#polygonWallet")[0]);
-
 })

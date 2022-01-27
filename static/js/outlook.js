@@ -4,9 +4,9 @@ class OutlookBreed extends React.Component {
             <div className="ui item">
                 <div className="ui content">
                     <span className="ui small text">
-                        <a href={`https://https://play.pegaxy.io/my-assets/pega/${this.props.breed.sire.id}`}>{this.props.breed.sire.id}</a>
+                        <a href={`https://play.pegaxy.io/my-assets/pega/${this.props.breed.sire.id}`}>{this.props.breed.sire.id}</a>
                         <i className="ui heart outline icon"/>
-                        <a href={`https://https://play.pegaxy.io/my-assets/pega/${this.props.breed.matron.id}`}>{this.props.breed.matron.id}</a>
+                        <a href={`https://play.pegaxy.io/my-assets/pega/${this.props.breed.matron.id}`}>{this.props.breed.matron.id}</a>
                     </span>
                 </div>
             </div>
