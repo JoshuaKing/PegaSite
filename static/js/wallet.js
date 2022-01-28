@@ -31,8 +31,10 @@ class Wallet extends React.Component {
 
     async handleSubmit(event) {
         // commented out to allow page redirect for url with 'wallet' GET param
-        // event.preventDefault();
-        // await this.retrieve();
+        if (this.state.wallet === this.getParamWallet) {
+            event.preventDefault();
+            await this.retrieve();
+        }
     }
 
     async retrieve() {
