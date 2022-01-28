@@ -55,8 +55,7 @@ class Wallet extends React.Component {
             p.breedString = p.isBreedable ? `Now (${new Date(p.breedable * 1000).toLocaleString()})` : `Can breed ${new Date(p.breedable * 1000).toLocaleString()}`;
         })
 
-        ReactDOM.render(<PegaStats pegas={pegaData} vis={currencyData.vis} usdt={currencyData.usdt}
-                                   pricing={pricing}/>, $("#pegaStats")[0]);
+        ReactDOM.render(<PegaStats pegas={pegaData} currency={currencyData} pricing={pricing}/>, $("#pegaStats")[0]);
         ReactDOM.render(<Outlook pegas={pegaData} pricing={pricing}/>, $("#pegaOutlook")[0]);
         ReactDOM.render(<PegaTable pegas={pegaData} pricing={pricing}/>, $("#pegaTable")[0]);
     }
