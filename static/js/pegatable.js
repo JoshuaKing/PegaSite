@@ -3,7 +3,11 @@ class PegaRow extends React.Component {
         const p = this.props.pega;
         return (
             <tr key={p.id}>
-                <td><a href={`https://play.pegaxy.io/my-assets/pega/${p.id}`}>{p.id}</a></td>
+                <td><a href={`https://play.pegaxy.io/my-assets/pega/${p.id}`}>{p.id}{
+                    p.service === "MARKET_SERVICE" ?
+                        <i className="ui shopping cart icon" style={{paddingLeft: "1rem"}}/>
+                        : ""
+                }</a></td>
                 <td><i className={p.gender === "Male" ? "ui mars icon" : "ui venus icon"}/></td>
                 <td>{p.breedCount}</td>
                 <td>{p.energy}</td>

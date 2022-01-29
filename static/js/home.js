@@ -24,7 +24,8 @@ function getMaxBreeds(pricing) {
 }
 
 function getRequirements(pegas, pricing) {
-    pegas = JSON.parse(JSON.stringify(pegas));
+    pegas = JSON.parse(JSON.stringify(pegas))
+        .filter(p => p.service !== "MARKET_SERVICE");
     const breedCds = {
         Hoz: 24*60*60,
         Campona: 48*60*60,
