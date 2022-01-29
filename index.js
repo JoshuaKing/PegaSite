@@ -3,6 +3,13 @@ const app = express();
 import got from "got";
 import web3 from "web3"
 import {__express} from "pug";
+import {getClientIp} from 'request-ip';
+import SimpleLogger from 'simple-node-logger';
+const log = SimpleLogger.createSimpleLogger({
+    logFilePath:'wallet-ips.log',
+    timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
+});
+
 
 const port = 3700;
 const POLY_API_KEY = "37WD3AS1WC3VQJ5DY4UM7H6TVT94HEYIYT";
@@ -72,6 +79,8 @@ async function updatePrices() {
 app.get("/my-pegas", async (req,res) => {
     let wallet = req.query.wallet;
     wallet = web3.utils.toChecksumAddress(wallet);
+    const clientIp = getClientIp(req);
+    log.info(`Wallet: ${wallet} IP: ${clientIp}`);
 
     let data = await got({
         method: "get",
@@ -176,13 +185,13 @@ app.get("/pricing", async (req,res) => {
     let v = await visPromise;
     let visToken = JSON.parse(v.body).data.pools[0];
     visPrice = visToken ? parseFloat(visToken.token0Price) : visPrice;
-    console.log(visToken, visPrice);
+    console.log("VIS: ", visPrice);
 
     // pgx
     let p = await pgxPromise;
     let pgxToken = JSON.parse(p.body).data.pools[0];
-    pgxPrice = pgxToken ? parseFloat(pgxToken.token0Price) : pgxPrice;
-    console.log(pgxToken, pgxPrice);
+    pgxPrice = pgxToken ? parseFloat(pgxToken.token1Price) : pgxPrice;
+    console.log("PGX: ", pgxPrice);
 
     res.send({
         bredFloor: bredFloor,
