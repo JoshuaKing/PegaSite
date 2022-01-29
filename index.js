@@ -6,7 +6,7 @@ import {__express} from "pug";
 
 const port = 3700;
 const POLY_API_KEY = "37WD3AS1WC3VQJ5DY4UM7H6TVT94HEYIYT";
-const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36";
+const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36";
 const breedCds = {
     Hoz: 24*60*60,
     Campona: 48*60*60,
@@ -15,8 +15,10 @@ const breedCds = {
 };
 
 const VIS_TOKEN_CONTRACT = `0xcc1b9517460d8ae86fe576f614d091fca65a28fc`;
+const VIS_TOKEN = `0xecf185d8114664e42dae0701eaff1a50a3613a05`;
 const USDT_TOKEN_CONTRACT = `0xc2132d05d31c914a87c6611c10748aeb04b58e8f`;
 const PGX_TOKEN_CONTRACT = `0xc1c93D475dc82Fe72DBC7074d55f5a734F8cEEAE`;
+const PGX_TOKEN = `0x3f1f398887525d2d9acd154ec5e4a3979adffae6`;
 
 let visPrice = 0;
 let pgxPrice = 0;
@@ -28,16 +30,18 @@ let pgxPromise;     // pgx
 
 function updateVisPrice() {
     visPromise = got({
-        method: 'get',
-        url: `https://aggregator-api.kyberswap.com/polygon/route?tokenIn=${USDT_TOKEN_CONTRACT}&tokenOut=${VIS_TOKEN_CONTRACT}&amountIn=100000000000000000000&saveGas=0&gasInclude=1&r=${Math.random()}`
+        method: 'post',
+        url: `https://api.thegraph.com/subgraphs/name/dynamic-amm/dmm-exchange-matic`,
+        json: {"query":"fragment PoolFields on Pool {\n  id\n  txCount\n  token0 {\n    id\n    symbol\n    name\n    totalLiquidity\n    derivedETH\n    __typename\n  }\n  token1 {\n    id\n    symbol\n    name\n    totalLiquidity\n    derivedETH\n    __typename\n  }\n  amp\n  reserve0\n  reserve1\n  vReserve0\n  vReserve1\n  reserveUSD\n  totalSupply\n  trackedReserveETH\n  reserveETH\n  volumeUSD\n  feeUSD\n  untrackedVolumeUSD\n  untrackedFeeUSD\n  token0Price\n  token1Price\n  token0PriceMin\n  token0PriceMax\n  token1PriceMin\n  token1PriceMax\n  createdAtTimestamp\n  __typename\n}\n\nquery pools($allPools: [Bytes]!) {\n  pools(where: {id_in: $allPools}, orderBy: trackedReserveETH, orderDirection: desc) {\n    ...PoolFields\n    __typename\n  }\n}\n","variables":{"allPools":[VIS_TOKEN]},"operationName":"pools"},
     });
     return visPromise;
 }
 
 function updatePgxPrice() {
     pgxPromise = got({
-        method: 'get',
-        url: `https://aggregator-api.kyberswap.com/polygon/route?tokenIn=${USDT_TOKEN_CONTRACT}&tokenOut=${PGX_TOKEN_CONTRACT}&amountIn=100000000000000000000&saveGas=0&gasInclude=1&r=${Math.random()}`
+        method: 'post',
+        url: `https://api.thegraph.com/subgraphs/name/dynamic-amm/dmm-exchange-matic`,
+        json: {"query":"fragment PoolFields on Pool {\n  id\n  txCount\n  token0 {\n    id\n    symbol\n    name\n    totalLiquidity\n    derivedETH\n    __typename\n  }\n  token1 {\n    id\n    symbol\n    name\n    totalLiquidity\n    derivedETH\n    __typename\n  }\n  amp\n  reserve0\n  reserve1\n  vReserve0\n  vReserve1\n  reserveUSD\n  totalSupply\n  trackedReserveETH\n  reserveETH\n  volumeUSD\n  feeUSD\n  untrackedVolumeUSD\n  untrackedFeeUSD\n  token0Price\n  token1Price\n  token0PriceMin\n  token0PriceMax\n  token1PriceMin\n  token1PriceMax\n  createdAtTimestamp\n  __typename\n}\n\nquery pools($allPools: [Bytes]!) {\n  pools(where: {id_in: $allPools}, orderBy: trackedReserveETH, orderDirection: desc) {\n    ...PoolFields\n    __typename\n  }\n}\n","variables":{"allPools":[PGX_TOKEN]},"operationName":"pools"},
     });
     return pgxPromise;
 }
@@ -60,22 +64,9 @@ async function updatePrices() {
         }
     }).json();
 
-    let v = await updateVisPrice();
-    let visToken = Object.values(JSON.parse(v.body).tokens).find(t=>t.symbol==='VIS');
-    for (let i = 0; i < 10 && typeof visToken === "undefined"; i++) {
-        console.log("Retrying VIS Price")
-        v = await updateVisPrice();
-        visToken = Object.values(JSON.parse(v.body).tokens).find(t=>t.symbol==='VIS');
-    }
+    updateVisPrice();
 
-    let p = await updatePgxPrice();
-    let pgxToken = Object.values(JSON.parse(p.body).tokens).find(t=>t.symbol==='PGX');
-    for (let i = 0; i < 10 && typeof pgxToken === "undefined"; i++) {
-        console.log("Retrying PGX Price")
-        p = await updatePgxPrice();
-        pgxToken = Object.values(JSON.parse(p.body).tokens).find(t=>t.symbol==='PGX');
-        console.log(pgxToken ? pgxToken.price : pgxToken);
-    }
+    updatePgxPrice();
 }
 
 app.get("/my-pegas", async (req,res) => {
@@ -183,14 +174,14 @@ app.get("/pricing", async (req,res) => {
 
     // vis
     let v = await visPromise;
-    let visToken = Object.values(JSON.parse(v.body).tokens).find(t=>t.symbol==='VIS');
-    visPrice = visToken ? visToken.price : visPrice;
+    let visToken = JSON.parse(v.body).data.pools[0];
+    visPrice = visToken ? parseFloat(visToken.token0Price) : visPrice;
     console.log(visToken, visPrice);
 
     // pgx
     let p = await pgxPromise;
-    let pgxToken = Object.values(JSON.parse(p.body).tokens).find(t=>t.symbol==='PGX');
-    pgxPrice = pgxToken ? pgxToken.price : pgxPrice;
+    let pgxToken = JSON.parse(p.body).data.pools[0];
+    pgxPrice = pgxToken ? parseFloat(pgxToken.token0Price) : pgxPrice;
     console.log(pgxToken, pgxPrice);
 
     res.send({
