@@ -228,7 +228,7 @@ app.get("/pricing", async (req,res) => {
 
 app.get("/", (req,res) => {
     if (!checkGeo(req)) {
-        res.status(403).json({ 'error': 'forbidden - contact on discord for access: Vier#9600' });
+        res.status(403).json({});
         return;
     }
     res.render("page");
