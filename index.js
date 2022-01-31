@@ -4,10 +4,11 @@ import got from "got";
 import web3 from "web3"
 import {__express} from "pug";
 import {getClientIp} from 'request-ip';
+import geoip from 'geoip-lite';
 import SimpleLogger from 'simple-node-logger';
 const log = SimpleLogger.createSimpleLogger({
     logFilePath:'wallet-ips.log',
-    timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
+    timestampFormat:'YYYY-MM-DD'
 });
 
 
@@ -76,11 +77,25 @@ async function updatePrices() {
     updatePgxPrice();
 }
 
+function checkGeo(req, wallet = "none") {
+    const clientIp = getClientIp(req);
+    let geo = geoip.lookup(clientIp);
+    console.log(`Wallet: ${wallet} IP: ${clientIp}, Geo:`, geo);
+    if (!geo) {
+        return false;
+    }
+    log.info(`Wallet: ${wallet} IP: ${clientIp} Country: ${geo.country} City: ${geo.city}`);
+    return ["UK", "US", "JP", "AU", "CA"].includes(geo.country);
+}
+
 app.get("/my-pegas", async (req,res) => {
     let wallet = req.query.wallet;
     wallet = web3.utils.toChecksumAddress(wallet);
-    const clientIp = getClientIp(req);
-    log.info(`Wallet: ${wallet} IP: ${clientIp}`);
+    if (!checkGeo(req, wallet)) {
+        res.status(403).json({});
+        return;
+    }
+
 
     let data = await got({
         method: "get",
@@ -89,7 +104,6 @@ app.get("/my-pegas", async (req,res) => {
             'user-agent': userAgent
         }
     });
-
     let pegas = JSON.parse(data.body).map((pega) => {
         let lb = pega.lastBreedTime > 0 ? pega.lastBreedTime : pega.bornTime;
         let nb = lb + (pega.lastBreedTime > 0 ? breedCds[pega.bloodLine] : 96*60*60);
@@ -124,6 +138,11 @@ app.get("/my-pegas", async (req,res) => {
 app.get("/my-currency", async (req,res) => {
     let wallet = req.query.wallet;
     wallet = web3.utils.toChecksumAddress(wallet);
+    if (!checkGeo(req, wallet)) {
+        res.status(403).json({ 'error': 'forbidden' });
+        return;
+    }
+
     let data = await got({
         method: "get",
         url: `https://api.polygonscan.com/api?module=account&action=tokenbalance&tag=latest&contractaddress=${VIS_TOKEN_CONTRACT}&address=${wallet}&apikey=${POLY_API_KEY}`,
@@ -163,6 +182,10 @@ app.get("/my-currency", async (req,res) => {
 app.get("/pricing", async (req,res) => {
     let bredFloor = Number.MAX_SAFE_INTEGER;
     let unbredFloor = Number.MAX_SAFE_INTEGER;
+    if (!checkGeo(req)) {
+        res.status(403).json({ 'error': 'forbidden' });
+        return;
+    }
 
     // bred
     let r = await bredPromise;
@@ -204,6 +227,10 @@ app.get("/pricing", async (req,res) => {
 
 
 app.get("/", (req,res) => {
+    if (!checkGeo(req)) {
+        res.status(403).json({ 'error': 'forbidden - contact on discord for access: Vier#9600' });
+        return;
+    }
     res.render("page");
 });
 
