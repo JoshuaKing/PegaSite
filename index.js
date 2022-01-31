@@ -85,7 +85,7 @@ function checkGeo(req, wallet = "none") {
         return false;
     }
     log.info(`Wallet: ${wallet} IP: ${clientIp} Country: ${geo.country} City: ${geo.city}`);
-    return ["UK", "US", "JP", "AU", "CA"].includes(geo.country);
+    return ["UK", "US", "JP", "AU", "CA"].includes(geo.country) || parseInt(geo.eu) == 1;
 }
 
 app.get("/my-pegas", async (req,res) => {
