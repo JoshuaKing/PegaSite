@@ -13,6 +13,7 @@ class PegaRow extends React.Component {
                 <td>{p.energy}</td>
                 <td>{p.isRented ? "Rented" : ""}</td>
                 <td>{p.breedString}</td>
+                <td>{Math.round(p.winRate * 100)}%</td>
                 <td>{p.name}</td>
             </tr>
         )
@@ -145,7 +146,8 @@ class PegaTable extends React.Component {
                         <th onClick={()=>this.sort('breedCount')}>BC</th>
                         <th onClick={()=>this.sort('energy')}>Energy</th>
                         <th onClick={()=>this.sort('renterAddress')}>Rented</th>
-                        <th onClick={()=>this.sort('breedCount')}>Breedable</th>
+                        <th onClick={()=>this.sort('breedable')}>Breedable</th>
+                        <th onClick={()=>this.sort('winRate')}>WR</th>
                         <th onClick={()=>this.sort('name')}>Name</th>
                     </tr>
                     </thead>

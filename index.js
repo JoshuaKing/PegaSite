@@ -114,7 +114,8 @@ app.get("/my-pegas", async (req,res) => {
             lastRenterIsDirect: pega.lastRenterIsDirect,
             bornTime: pega.bornTime,
             isBreedable: breedable,
-            breedable: nb
+            breedable: nb,
+            winRate: pega.winRate
         };
     }).sort((a,b) => a.breedable - b.breedable);
 
