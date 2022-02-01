@@ -81,11 +81,13 @@ function checkGeo(req, wallet = "none") {
     const clientIp = getClientIp(req);
     let geo = geoip.lookup(clientIp);
     console.log(`Wallet: ${wallet} IP: ${clientIp}, Geo:`, geo);
-    if (!geo) {
+    if (clientIp === "::1") {
+        return true;
+    } else if (!geo) {
         return false;
     }
     log.info(`Wallet: ${wallet} IP: ${clientIp} Country: ${geo.country} City: ${geo.city}`);
-    return ["UK", "US", "JP", "AU", "CA"].includes(geo.country) || parseInt(geo.eu) == 1;
+    return ["UK", "US", "JP", "AU", "CA"].includes(geo.country) || parseInt(geo.eu) === 1;
 }
 
 app.get("/my-pegas", async (req,res) => {

@@ -1,5 +1,8 @@
 class Wallet extends React.Component {
     getParamWallet = "";
+    pegastats = null;
+    outlook = null;
+    pegatable = null;
 
     constructor() {
         super();
@@ -55,18 +58,49 @@ class Wallet extends React.Component {
             p.breedString = p.isBreedable ? `Now (${new Date(p.breedable * 1000).toLocaleString()})` : `Can breed ${new Date(p.breedable * 1000).toLocaleString()}`;
         })
 
-        ReactDOM.render(<PegaStats pegas={pegaData} currency={currencyData} pricing={pricing}/>, $("#pegaStats")[0]);
-        ReactDOM.render(<Outlook pegas={pegaData} pricing={pricing}/>, $("#pegaOutlook")[0]);
-        ReactDOM.render(<PegaTable pegas={pegaData} pricing={pricing}/>, $("#pegaTable")[0]);
+        this.pegastats = ReactDOM.render(<PegaStats pegas={pegaData} currency={currencyData} pricing={pricing}/>, $("#pegaStats")[0]);
+        this.outlook = ReactDOM.render(<Outlook pegas={pegaData} pricing={pricing}/>, $("#pegaOutlook")[0]);
+        this.pegatable = ReactDOM.render(<PegaTable pegas={pegaData} pricing={pricing} maxBreeds={this.state.MaxBreedSlider}/>, $("#pegaTable")[0]);
+    }
+
+    maxBreedCount(value) {
+        MaxBreedSlider = value;
+        this.pegastats.setState({ MaxBreedSlider: value });
+        this.outlook.setState({ MaxBreedSlider: value });
+        this.pegatable.setState({ MaxBreedSlider: value });
+    }
+
+    componentDidMount() {
+        $('.ui.slider').slider();
+        $('.ui.breedcount.slider').slider({
+            min: 1,
+            max: 4,
+            start: 3,
+            onChange: (value, text, $item) => this.maxBreedCount(value)
+        });
+        console.log("breed count slider ", $('.ui.breedcount.slider'));
     }
 
     render() {
         return (
-            <form className="ui labeled action input" onSubmit={this.handleSubmit}>
-                <div className="ui label">Polygon Wallet:</div>
-                <input id="wallet" name="wallet" className="ui input" style={{"width": "350px"}} onChange={this.handleChange} value={this.state.wallet}/>
-                <button className="ui teal button" type="submit">Retrieve</button>
-            </form>
+            <div>
+                <form className="ui form" onSubmit={this.handleSubmit}>
+                    <div className="inline fields">
+                        <div className="ui eight wide field">
+                            <div className="ui labeled action input">
+                                <div className="ui label">Polygon Wallet:</div>
+                                <input id="wallet" name="wallet" className="ui input" style={{"width": "350px"}} onChange={this.handleChange} value={this.state.wallet}/>
+                                <button className="ui teal button" type="submit">Retrieve</button>
+                            </div>
+                        </div>
+                        <div className="ui three wide field"/>
+                        <div className="ui three wide field">
+                            <div className="ui label">Max Breeds:</div>
+                            <div className="breedcount ui bottom aligned small labeled slider"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
         );
     }
 }

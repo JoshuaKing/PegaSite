@@ -4,6 +4,8 @@ function isNumeric(str) {
         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
+let MaxBreedSlider = 4;
+
 function getMaxBreeds(pricing) {
     const breedCosts = {
         "1": 4000,
@@ -19,8 +21,8 @@ function getMaxBreeds(pricing) {
             maxBreeds++;
         }
     }
-    console.log("Max Breeds = " + maxBreeds);
-    return maxBreeds;
+    console.log("Max Breeds = " + maxBreeds + " maxed: " + Math.min(maxBreeds, MaxBreedSlider));
+    return Math.min(maxBreeds, MaxBreedSlider);
 }
 
 function getRequirements(pegas, pricing) {
