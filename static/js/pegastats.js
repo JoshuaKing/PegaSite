@@ -37,11 +37,11 @@ class PegaStats extends React.Component {
                         <div className="label">VIS Breed Cost</div>
                     </div>
                     <div className="ui small statistic">
-                        <div className="value">${pricing.bredFloor}</div>
+                        <div className="value">${Math.round(pricing.bredFloor)}</div>
                         <div className="label">Bred Floor</div>
                     </div>
                     <div className="ui small statistic">
-                        <div className="value">${pricing.unbredFloor}</div>
+                        <div className="value">${Math.round(pricing.unbredFloor)}</div>
                         <div className="label">Unbred Floor</div>
                     </div>
                 </div>
