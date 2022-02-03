@@ -230,8 +230,8 @@ app.get("/pricing", async (req,res) => {
 
 app.get("/", (req,res) => {
     if (!checkGeo(req)) {
-        res.status(403).json({});
-        return;
+        // res.status(403).json({});
+        // return;
     }
     res.render("page");
 });
