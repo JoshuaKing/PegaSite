@@ -145,7 +145,7 @@ app.get("/my-currency", async (req,res) => {
         return;
     }
 
-    let data = await got({
+    let visData = got({
         method: "get",
         url: `https://api.polygonscan.com/api?module=account&action=tokenbalance&tag=latest&contractaddress=${VIS_TOKEN_CONTRACT}&address=${wallet}&apikey=${POLY_API_KEY}`,
         headers: {
@@ -153,7 +153,7 @@ app.get("/my-currency", async (req,res) => {
         }
     });
 
-    let usdtData = await got({
+    let usdtData = got({
         method: "get",
         url: `https://api.polygonscan.com/api?module=account&action=tokenbalance&tag=latest&contractaddress=${USDT_TOKEN_CONTRACT}&address=${wallet}&apikey=${POLY_API_KEY}`,
         headers: {
@@ -161,7 +161,7 @@ app.get("/my-currency", async (req,res) => {
         }
     });
 
-    let pgxData = await got({
+    let pgxData = got({
         method: "get",
         url: `https://api.polygonscan.com/api?module=account&action=tokenbalance&tag=latest&contractaddress=${PGX_TOKEN_CONTRACT}&address=${wallet}&apikey=${POLY_API_KEY}`,
         headers: {
@@ -169,15 +169,25 @@ app.get("/my-currency", async (req,res) => {
         }
     });
 
+    let unclaimedVisData = got({
+        method: "get",
+        url: `https://api-apollo.pegaxy.io/v1/assets/count/user/${wallet}`,
+        headers: {
+            'user-agent': userAgent
+        }
+    });
+
     const scale = 1000000000000000000;
-    let vis = JSON.parse(data.body).result / scale;
-    let usdt = JSON.parse(usdtData.body).result / 1000000;
-    let pgx = JSON.parse(pgxData.body).result / scale;
+    let vis = JSON.parse((await visData).body).result / scale;
+    let usdt = JSON.parse((await usdtData).body).result / 1000000;
+    let pgx = JSON.parse((await pgxData).body).result / scale;
+    let unclaimedVis = JSON.parse((await unclaimedVisData).body).lockedVis;
 
     res.send({
         vis: vis,
         usdt: usdt,
-        pgx: pgx
+        pgx: pgx,
+        unclaimedVis: unclaimedVis
     });
 })
 

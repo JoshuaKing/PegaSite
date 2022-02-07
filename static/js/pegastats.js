@@ -13,8 +13,9 @@ class PegaStats extends React.Component {
         let visValue = currency.vis * pricing.visPrice;
         let usdtValue = currency.usdt;
         let pgxValue = currency.pgx * pricing.pgxPrice;
-        let netWorth = pegasValue + visValue + pgxValue + usdtValue;
-        console.log(`net worth: ${pegasValue}(Pega) + ${visValue}(VIS) + ${pgxValue}(PGX) + ${usdtValue}(USDT) = ${netWorth}`);
+        let unclaimedVisValue = currency.unclaimedVis * pricing.visPrice;
+        let netWorth = pegasValue + visValue + pgxValue + usdtValue + unclaimedVisValue;
+        console.log(`net worth: ${pegasValue}(Pega) + ${visValue}(VIS) + ${pgxValue}(PGX) + ${usdtValue}(USDT) + ${unclaimedVisValue}(Locked VIS) = ${netWorth}`);
 
 
         return (
@@ -64,7 +65,8 @@ class PegaStats extends React.Component {
                         <div className="label">PGX Value</div>
                     </div>
                     <div className="ui small statistic">
-                        <div className="value">=</div>
+                        <div className="value">${Math.round(unclaimedVisValue/100)/10}k</div>
+                        <div className="label">Locked VIS Value</div>
                     </div>
                     <div className="ui small statistic">
                         <div className="value">${Math.round(netWorth/100)/10}k</div>
