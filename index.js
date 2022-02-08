@@ -31,8 +31,7 @@ const PGX_TOKEN = `0x3f1f398887525d2d9acd154ec5e4a3979adffae6`;
 let visPrice = 0;
 let pgxPrice = 0;
 
-let unbredPromise;  // unbred
-let bredPromise;    // bred
+let floorPromise;    // bred
 let visPromise;     // vis
 let pgxPromise;     // pgx
 
@@ -54,11 +53,11 @@ function updatePgxPrice() {
     return pgxPromise;
 }
 
-async function updateUnbredPrice() {
+async function updatePegaPricing() {
     try {
         return await got({
             method: 'get',
-            url: `https://api.pegaxy.io/market/pegasListing/0?bloodLine=Hoz&sortType=ASC&sortBy=price&isAuction=false&breedTime%5B0%5D=0`,
+            url: `https://api-apollo.pegaxy.io/v1/pegas/prices/floor?category=bloodLine,breedCount,gender,breedType&maxBreedCount=7&minBreedCount=0`,
             headers: {
                 'user-agent': userAgent
             }
@@ -71,28 +70,10 @@ async function updateUnbredPrice() {
     }
 }
 
-async function updateBredPricing() {
-    try {
-        return await got({
-            method: 'get',
-            url: `https://api.pegaxy.io/market/pegasListing/0?bloodLine=Hoz&sortType=ASC&sortBy=price&isAuction=false`,
-            headers: {
-                'user-agent': userAgent
-            }
-        }).json();
-    } catch(e) {
-        console.error("Error getting Bred pricing data: ", e.message);
-        return {
-            market: []
-        };
-    }
-}
-
 async function updatePrices() {
     console.debug("Updating Prices " + new Date().toLocaleTimeString())
-    unbredPromise = updateUnbredPrice();
 
-    bredPromise = updateBredPricing();
+    floorPromise = updatePegaPricing();
 
     updateVisPrice();
 
@@ -221,28 +202,13 @@ app.get("/pricing", async (req,res) => {
         return;
     }
 
-    // bred
-    let r = await bredPromise;
-    for (let a of r.market) {
-        if (a.isAuction) {
-            continue;
-        }
-        bredFloor = Math.min(bredFloor, a.price / 1000000);
-    }
-    if (r.market.length === 0) {
-        bredFloor = 0;
-    }
-
-    // unbred
-    r = await unbredPromise;
-    for (let a of r.market) {
-        if (a.isAuction) {
-            continue;
-        }
-        unbredFloor = Math.min(unbredFloor, a.price / 1000000)
-    }
-    if (r.market.length === 0) {
+    // unbred and bred
+    let r = await floorPromise;
+    unbredFloor = r.filter(p => p.bloodLine === "Hoz" && p.breedCount === 0).reduce((acc, p) => Math.min(p.price, acc), Number.MAX_SAFE_INTEGER);
+    bredFloor = r.filter(p => p.bloodLine === "Hoz" && p.breedCount > 0).reduce((acc, p) => Math.min(p.price, acc), Number.MAX_SAFE_INTEGER);
+    if (r.length === 0) {
         unbredFloor = 0;
+        bredFloor = 0;
     }
 
     // vis
