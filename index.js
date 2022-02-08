@@ -14,7 +14,7 @@ const log = SimpleLogger.createSimpleLogger({
 
 const port = 3700;
 const POLY_API_KEY = "37WD3AS1WC3VQJ5DY4UM7H6TVT94HEYIYT";
-const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36";
+const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.81 Safari/537.36";
 const breedCds = {
     Hoz: 24*60*60,
     Campona: 48*60*60,
@@ -54,23 +54,45 @@ function updatePgxPrice() {
     return pgxPromise;
 }
 
+async function updateUnbredPrice() {
+    try {
+        return await got({
+            method: 'get',
+            url: `https://api.pegaxy.io/market/pegasListing/0?bloodLine=Hoz&sortType=ASC&sortBy=price&isAuction=false&breedTime%5B0%5D=0`,
+            headers: {
+                'user-agent': userAgent
+            }
+        }).json();
+    } catch(e) {
+        console.error("Error getting Unbred pricing data: ", e.message);
+        return {
+            market: []
+        };
+    }
+}
+
+async function updateBredPricing() {
+    try {
+        return await got({
+            method: 'get',
+            url: `https://api.pegaxy.io/market/pegasListing/0?bloodLine=Hoz&sortType=ASC&sortBy=price&isAuction=false`,
+            headers: {
+                'user-agent': userAgent
+            }
+        }).json();
+    } catch(e) {
+        console.error("Error getting Bred pricing data: ", e.message);
+        return {
+            market: []
+        };
+    }
+}
+
 async function updatePrices() {
     console.debug("Updating Prices " + new Date().toLocaleTimeString())
-    unbredPromise = got({
-        method: 'get',
-        url: `https://api.pegaxy.io/market/pegasListing/0?bloodLine=Hoz&sortType=ASC&sortBy=price&isAuction=false&breedTime%5B0%5D=0`,
-        headers: {
-            'user-agent': userAgent
-        }
-    }).json();
+    unbredPromise = updateUnbredPrice();
 
-    bredPromise = got({
-        method: 'get',
-        url: `https://api.pegaxy.io/market/pegasListing/0?bloodLine=Hoz&sortType=ASC&sortBy=price&isAuction=false`,
-        headers: {
-            'user-agent': userAgent
-        }
-    }).json();
+    bredPromise = updateBredPricing();
 
     updateVisPrice();
 
@@ -207,6 +229,9 @@ app.get("/pricing", async (req,res) => {
         }
         bredFloor = Math.min(bredFloor, a.price / 1000000);
     }
+    if (r.market.length === 0) {
+        bredFloor = 0;
+    }
 
     // unbred
     r = await unbredPromise;
@@ -215,6 +240,9 @@ app.get("/pricing", async (req,res) => {
             continue;
         }
         unbredFloor = Math.min(unbredFloor, a.price / 1000000)
+    }
+    if (r.market.length === 0) {
+        unbredFloor = 0;
     }
 
     // vis
